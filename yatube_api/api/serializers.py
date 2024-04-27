@@ -1,8 +1,20 @@
-from rest_framework import serializers
+from rest_framework import serializers, validators
 from rest_framework.relations import SlugRelatedField
 
 
-from posts.models import Comment, Post
+from posts.models import Comment, Post, Group, Follow, User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    posts = serializers.StringRelatedField(many=True, read_only=True)
+    comments = serializers.StringRelatedField(many=True, read_only=True)
+    following = serializers.StringRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name', 'posts',
+                  'comments', 'following')
+        ref_name = 'ReadOnlyUsers'
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -21,3 +33,42 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
+        read_only_fields = ('post',)
+
+
+class GroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Group
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        queryset=User.objects.all(),
+        slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+    following = serializers.SlugRelatedField(
+        read_only=False,
+        queryset=User.objects.all(),
+        slug_field='username',
+    )
+
+    def validate(self, data):
+        if self.context['request'].user == data['following']:
+            raise serializers.ValidationError(
+                "You can't follow yourself"
+            )
+        return data
+
+    class Meta:
+        fields = '__all__'
+        model = Follow
+        validators = (
+            validators.UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=('user', 'following'),
+                message=('Вы уже подписаны на этого автора')
+            ),
+        )
