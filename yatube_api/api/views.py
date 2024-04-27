@@ -1,11 +1,10 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, pagination, permissions, filters
+from rest_framework import filters, pagination, permissions, viewsets
 
-from api.permissions import AuthorOrReadOnly, AuthorOnly
-from posts.models import Group, Post, User, Follow
-from api.serializers import (CommentSerializer, GroupSerializer,
-                             PostSerializer, UserSerializer,
-                             FollowSerializer)
+from api.permissions import AuthorOnly, AuthorOrReadOnly
+from api.serializers import (CommentSerializer, FollowSerializer,
+                             GroupSerializer, PostSerializer, UserSerializer)
+from posts.models import Follow, Group, Post, User
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
