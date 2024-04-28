@@ -19,10 +19,8 @@ class Group(models.Model):
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(
-        'Группа поста',
-        Group, on_delete=models.SET_NULL, blank=True, null=True
-    )
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True,
+                              null=True)
     text = models.TextField('Текст поста')
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     image = models.ImageField('Картинка к посту', upload_to='posts/',
