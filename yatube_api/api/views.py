@@ -5,7 +5,7 @@ from rest_framework.viewsets import mixins
 from api.permissions import AuthorOnly, AuthorOrReadOnly
 from api.serializers import (CommentSerializer, FollowSerializer,
                              GroupSerializer, PostSerializer, UserSerializer)
-from posts.models import Follow, Group, Post, User
+from posts.models import Group, Post, User
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -54,4 +54,4 @@ class FollowViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        return Follow.objects.filter(user=self.request.user)
+        return self.request.user.user.all()
